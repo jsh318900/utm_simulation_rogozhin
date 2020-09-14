@@ -69,22 +69,22 @@ public class Tape implements Iterable<Character> {
     /*Constructors*/
 
     /**
-     * Initializes empty Tape with given blank symbol.
+     * Initializes a tape with given input and a blank symbol. The first cell is head by default
+     * @param blank blank symbol of the tape
+     * @param input the initial content of the tape.
      */
-    public Tape(char blank){
-        BLANK = blank;
-        current = new Cell(BLANK, null, null);
-        front = current;
-        end = current;
+    public Tape(char blank, String input){
+        this(blank,0, input);
     }
 
     /**
      * Initializes a Tape with its current cell at head_index and its content being the input.
+     * @param blank blank symbol of the tape.
      * @param head_index the location of current cell
-     * @param input the content of the tape
+     * @param input the initial content of the tape
      * @throws NullPointerException if given String is null
      */
-    public Tape(int head_index, String input, char blank){
+    public Tape(char blank, int head_index, String input){
         //setting blank symbol
         BLANK = blank;
 
@@ -197,7 +197,7 @@ public class Tape implements Iterable<Character> {
      * @param word the String to add to the end of the tape
      */
     public void append(String word){
-        Tape other = new Tape(0, word, BLANK);
+        Tape other = new Tape(BLANK, 0, word);
         append(other);
     }
 
