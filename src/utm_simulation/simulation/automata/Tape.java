@@ -235,6 +235,25 @@ public class Tape implements Iterable<Character> {
     }
 
     /**
+     * returns the position of the head on the tape
+     *
+     * <p>Warning: This method is for gui purpose only and it will not trim the leading blank symbols.</p>
+     *
+     * @return the position of the head on the tape
+     */
+    public int headIndex(){
+        return headIndexRecurse(0, getFront());
+    }
+
+
+    private int headIndexRecurse(int current, Cell ptr){
+        if(ptr != getCurrent())
+            return headIndexRecurse(++current, ptr.getNext());
+        else
+            return current;
+    }
+
+    /**
      * Creates a String showing content of the tape
      * @return String representation of this Tape.
      */
