@@ -73,10 +73,27 @@ public abstract class Machine{
     }
 
     /**
-     * Runs the machine for one step.
-     * @throws IllegalStateException if the machine already halted.
+     * Returns whether the next transition is a deterministic one
+     * @return whether the next transition is a deterministic one
      */
-    public abstract void execute() throws IllegalStateException;
+    public boolean isDeterministic(){
+        return getTransition().isDeterministic(getCurrentState(), getInput_tape().read());
+    }
+
+    /**
+     * Runs the machine for one step. Should only be used for deterministic action
+     * @throws IllegalStateException if the machine already halted.
+     * @throws UnsupportedOperationException if called when next action is a non-deterministic one
+     */
+    public abstract void execute() throws IllegalStateException, UnsupportedOperationException;
+
+    /**
+     * Runs the machine for one step. Should only be used for non-deterministic action
+     * @param choice specifying the choice
+     * @throws IllegalStateException if the machine already halted
+     * @throws UnsupportedOperationException if called when next action is a deterministic one.
+     */
+    public abstract void execute(int choice) throws IllegalStateException, UnsupportedOperationException;
 
     /**
      * Returns the String representation of the machine
