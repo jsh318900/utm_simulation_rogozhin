@@ -112,6 +112,10 @@ public class Tape implements Iterable<Character> {
     }
 
     /*getter methods*/
+    public char getBLANK(){
+        return BLANK;
+    }
+
     protected Cell getCurrent(){
         return current;
     }

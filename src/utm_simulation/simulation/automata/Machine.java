@@ -13,6 +13,13 @@ public abstract class Machine{
     private int currentState;
     private Tape input_tape;
 
+    /**
+     * Creates a machine with given information
+     * @param symbols set of characters used by the machine and tape
+     * @param numStates number of states of the machine
+     * @param transition the transition function of the machine
+     * @param input the initial input to the tape
+     */
     public Machine(char[] symbols, int numStates, Transition transition, String input){
         this.symbols = Arrays.copyOf(symbols, symbols.length);
         this.numStates = numStates;
@@ -54,6 +61,17 @@ public abstract class Machine{
     }
 
     /**
+     * Modifies the current state of the machine
+     * @param currentState the new state of the machine
+     * @throws IllegalArgumentException if given state does not exist.
+     */
+    protected void setCurrentState(int currentState){
+        if(currentState < -1 && currentState > getNumStates())
+            throw new IllegalArgumentException("Given state does not exist");
+        this.currentState = currentState;
+    }
+
+    /**
      * Returns the working tape instance
      * @return the working tape instance
      */
@@ -61,15 +79,8 @@ public abstract class Machine{
         return input_tape;
     }
 
-    /**
-     * Modifies the current state of the machine
-     * @param currentState the new state of the machine
-     * @throws IllegalArgumentException if given state does not exist.
-     */
-    public void setCurrentState(int currentState){
-        if(currentState < -1 && currentState > getNumStates())
-            throw new IllegalArgumentException("Given state does not exist");
-        this.currentState = currentState;
+    protected void setInput_tape(Tape tape){
+        input_tape = tape;
     }
 
     /**
@@ -78,6 +89,15 @@ public abstract class Machine{
      */
     public boolean isDeterministic(){
         return getTransition().isDeterministic(getCurrentState(), getInput_tape().read());
+    }
+
+    /**
+     * Resets the machine with new input given
+     * @param input new input given.
+     */
+    public void reset(String input){
+        setCurrentState(1);
+        setInput_tape(new Tape(getInput_tape().getBLANK(), input));
     }
 
     /**
@@ -95,10 +115,4 @@ public abstract class Machine{
      */
     public abstract void execute(int choice) throws IllegalStateException, UnsupportedOperationException;
 
-    /**
-     * Returns the String representation of the machine
-     * @return the String representation of the machine.
-     */
-    @Override
-    public abstract String toString();
 }
