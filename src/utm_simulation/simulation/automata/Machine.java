@@ -4,26 +4,34 @@ import java.util.Arrays;
 
 public abstract class Machine{
 
-    /**Reserved state for Halt, set to -1.*/
-    public static final int HALT = -1;
+    /*Constant Strings for xml parsing*/
+    public static final String MACHINE = "Machine";
+    public static final String CLASS = "Class";
+    public static final String SYMBOLS = "Symbols";
+    public static final String SYMBOL = "Symbol";
+    public static final String TRANSITIONS = "Transitions";
+    public static final String TRANSITION = "Transition";
+    public static final String INPUT = "Input";
+    public static final String NUMSTATES = "NumStates";
+    public static final String TYPE = "Type";
+    public static final String STATE = "State";
+    public static final String STATE_TRANSITION = "state_transition";
+    public static final String APPEND = "append";
+    public static final String HALT = "halt";
+    public static final String NEWSTATE = "NewState";
+    public static final String NEWSYMBOL = "NewSymbol";
+    public static final String DIRECTION = "Direction";
 
     private final char[] symbols;
-    private final int numStates;
-    private final Transition transition;
-    private int currentState;
     private Tape input_tape;
 
     /**
      * Creates a machine with given information
      * @param symbols set of characters used by the machine and tape
-     * @param numStates number of states of the machine
-     * @param transition the transition function of the machine
      * @param input the initial input to the tape
      */
-    public Machine(char[] symbols, int numStates, Transition transition, String input){
+    public Machine(char[] symbols, String input){
         this.symbols = Arrays.copyOf(symbols, symbols.length);
-        this.numStates = numStates;
-        this.transition = transition;
         input_tape = new Tape(symbols[0], input);
     }
 
@@ -34,41 +42,6 @@ public abstract class Machine{
      */
     public char[] getSymbols(){
         return Arrays.copyOf(symbols, symbols.length);
-    }
-
-    /**
-     * Returns the number of states of the machine
-     * @return the number of states of the machine
-     */
-    public int getNumStates(){
-        return numStates;
-    }
-
-    /**
-     * Returns the Transition function object for the machine
-     * @return the Transition function object for the machine
-     */
-    protected Transition getTransition(){
-        return transition;
-    }
-
-    /**
-     * Returns the number indicating the current state of the machine.
-     * @return the number indicating the current state of the machine.
-     */
-    public int getCurrentState(){
-        return currentState;
-    }
-
-    /**
-     * Modifies the current state of the machine
-     * @param currentState the new state of the machine
-     * @throws IllegalArgumentException if given state does not exist.
-     */
-    protected void setCurrentState(int currentState){
-        if(currentState < -1 && currentState > getNumStates())
-            throw new IllegalArgumentException("Given state does not exist");
-        this.currentState = currentState;
     }
 
     /**
@@ -87,16 +60,13 @@ public abstract class Machine{
      * Returns whether the next transition is a deterministic one
      * @return whether the next transition is a deterministic one
      */
-    public boolean isDeterministic(){
-        return getTransition().isDeterministic(getCurrentState(), getInput_tape().read());
-    }
+    public abstract boolean isDeterministic();
 
     /**
      * Resets the machine with new input given
      * @param input new input given.
      */
     public void reset(String input){
-        setCurrentState(1);
         setInput_tape(new Tape(getInput_tape().getBLANK(), input));
     }
 
