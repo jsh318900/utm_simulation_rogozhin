@@ -4,6 +4,11 @@ import java.util.Arrays;
 
 public abstract class Machine{
 
+    /**
+     * Represents the type of transition that the machine performs.
+     */
+    public enum TransitionType{APPEND, HALT, STATE_TRANSITION}
+
     /*Constant Strings for xml parsing*/
     public static final String MACHINE = "Machine";
     public static final String CLASS = "Class";
@@ -27,12 +32,13 @@ public abstract class Machine{
 
     /**
      * Creates a machine with given information
+     * @param blank the blank symbol of the tape
      * @param symbols set of characters used by the machine and tape
      * @param input the initial input to the tape
      */
-    public Machine(char[] symbols, String input){
+    public Machine(char blank, char[] symbols, String input){
         this.symbols = Arrays.copyOf(symbols, symbols.length);
-        input_tape = new Tape(symbols[0], input);
+        input_tape = new Tape(blank, input);
     }
 
     /**
@@ -57,18 +63,18 @@ public abstract class Machine{
     }
 
     /**
-     * Returns whether the next transition is a deterministic one
-     * @return whether the next transition is a deterministic one
-     */
-    public abstract boolean isDeterministic();
-
-    /**
      * Resets the machine with new input given
      * @param input new input given.
      */
     public void reset(String input){
         setInput_tape(new Tape(getInput_tape().getBLANK(), input));
     }
+
+    /**
+     * Returns whether the next transition is a deterministic one
+     * @return whether the next transition is a deterministic one
+     */
+    public abstract boolean isDeterministic();
 
     /**
      * Runs the machine for one step. Should only be used for deterministic action
