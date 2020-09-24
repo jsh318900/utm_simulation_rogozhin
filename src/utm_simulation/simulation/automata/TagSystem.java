@@ -20,9 +20,6 @@ import java.util.Iterator;
  */
 public class TagSystem extends Machine{
 
-    /** constant String used for configuration parsing*/
-    public static final String DELETIONNUMBER = "DeletionNumber";
-
     /**
      * Represents a transition rule defined for a symbol.
      */
@@ -147,22 +144,7 @@ public class TagSystem extends Machine{
         }
 
         TagSystemTransition t = getTransition(getInput_tape().read()).get(0);
-        switch (t.getType()) {
-            case APPEND -> {
-                getInput_tape().append(t.getAppend());
-                int delete = getDeletionNumber();
-                while (delete > 0) {
-                    getInput_tape().write(getInput_tape().getBLANK());
-                    getInput_tape().shift(1);
-                    delete--;
-                }
-            }
-            case HALT -> halt();
-            default -> {
-                System.err.println("Fatal error when generating this tagsystem");
-                System.exit(-1);
-            }
-        }
+        execute(t);
     }
 
     /**
@@ -177,6 +159,10 @@ public class TagSystem extends Machine{
         }
 
         TagSystemTransition t = getTransition(getInput_tape().read()).get(choice);
+        execute(t);
+    }
+
+    protected void execute(TagSystemTransition t){
         switch (t.getType()) {
             case APPEND -> {
                 getInput_tape().append(t.getAppend());
@@ -280,7 +266,7 @@ public class TagSystem extends Machine{
                                 else if(attribute.getName().toString().equals(SYMBOL))
                                     symbol = attribute.getValue().charAt(0);
                                 else{
-                                    System.err.println("Unexpected tag in transition definition");
+                                    System.err.printf("Unexpected tag in transition definition: %s\n", attribute.getName().toString());
                                     System.exit(-1);
                                 }
                             }
@@ -289,7 +275,7 @@ public class TagSystem extends Machine{
                             }else if(type.equals(HALT)){
                                 transitions.add(new TagSystemTransition(TransitionType.HALT, symbol, ""));
                             }else{
-                                System.err.println("Unexpected transition type for tagsystem.");
+                                System.err.printf("Unexpected transition type for tagsystem: %s\n", type);
                                 System.exit(-1);
                             }break;
 

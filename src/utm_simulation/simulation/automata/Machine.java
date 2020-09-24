@@ -26,6 +26,7 @@ public abstract class Machine{
     public static final String NEWSTATE = "NewState";
     public static final String NEWSYMBOL = "NewSymbol";
     public static final String DIRECTION = "Direction";
+    public static final String DELETIONNUMBER = "DeletionNumber";
 
     private final char[] symbols;
     private Tape input_tape;
