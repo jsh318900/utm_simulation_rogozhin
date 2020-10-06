@@ -71,6 +71,10 @@ public abstract class Machine{
         setInput_tape(new Tape(getInput_tape().getBLANK(), input));
     }
 
+    public void reset(String input, int headIndex){
+        setInput_tape(new Tape(getInput_tape().getBLANK(), headIndex, input));
+    }
+
     /**
      * Returns whether the next transition is a deterministic one
      * @return whether the next transition is a deterministic one

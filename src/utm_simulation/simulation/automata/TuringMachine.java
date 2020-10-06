@@ -1,5 +1,6 @@
 package utm_simulation.simulation.automata;
 
+import javax.xml.namespace.QName;
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
@@ -121,7 +122,7 @@ public class TuringMachine extends Machine{
      * @throws IllegalArgumentException if given state does not exist.
      */
     protected void setCurrentState(int currentState){
-        if(currentState <= 0 || currentState > getNumStates())
+        if(currentState <= -2 || currentState == 0 || currentState > getNumStates())
             throw new IllegalArgumentException("Given state does not exist");
         this.currentState = currentState;
     }
@@ -192,18 +193,45 @@ public class TuringMachine extends Machine{
     }
 
     private void execute(TuringTransition t){
-        switch(t.getType()){
-            case STATE_TRANSITION -> {
+        switch (t.getType()) {
+            case STATE_TRANSITION:
                 getInput_tape().write(t.getNextSymbol());
                 getInput_tape().shift(t.getShift());
                 setCurrentState(t.getNextState());
-            }
-            case HALT -> setCurrentState(-1);
-            default -> {
+                break;
+            case HALT:
+                setCurrentState(-1);
+                break;
+            default:
                 System.err.println("Fatal error when generating this machine");
                 System.exit(-1);
-            }
         }
+    }
+
+    public String toString(){
+        Iterator<Character> beforeHead = getInput_tape().reverseIterator(getInput_tape().headIndex());
+        Iterator<Character> afterHead = getInput_tape().iterator(getInput_tape().headIndex());
+
+        StringBuilder builder = new StringBuilder();
+        while(beforeHead.hasNext()){
+            builder.append(beforeHead.next());
+        }
+
+        builder.reverse();
+
+        if(builder.length() != 0){
+            builder.deleteCharAt(builder.length() - 1);
+            builder.append("(q").append(getCurrentState()).append(", ").append(getInput_tape().read()).append(")");
+        }
+
+        if(afterHead.hasNext())
+            afterHead.next();
+
+        while(afterHead.hasNext()){
+            builder.append(afterHead.next());
+        }
+
+        return builder.toString();
     }
 
     public static TuringMachine buildMachine(String config){
@@ -240,56 +268,47 @@ public class TuringMachine extends Machine{
 
                     switch(elementName){
                         case CLASS:
-
-                            if(!element.asCharacters().getData().equals("TuringMachine")){
+                            event = reader.nextEvent();
+                            if(!event.asCharacters().getData().equals("TuringMachine")){
                                 System.err.println("Invalid class value for Turing machine");
                                 System.exit(-1);
                             }break;
 
                         case SYMBOL:
-                            attributes = element.getAttributes();
-                            if (attributes.hasNext()) {
-                                attribute = attributes.next();
-                                if(attribute.getName().toString().equals(TYPE) && attribute.getValue().equals("blank")){
-                                    blank = element.getName().getLocalPart().charAt(0);
-                                }
+                            Attribute type = element.getAttributeByName(new QName(TYPE));
+                            event = reader.nextEvent();
+                            if(type != null && type.getValue().equals("blank")){
+                                blank = event.asCharacters().getData().charAt(0);
                             }
-                            symbols_temp.add(element.asCharacters().getData().charAt(0));break;
+
+                            symbols_temp.add(event.asCharacters().getData().charAt(0));break;
 
                         case NUMSTATES:
-                            numStates = Integer.parseInt(element.asCharacters().getData());break;
+                            event = reader.nextEvent();
+                            numStates = Integer.parseInt(event.asCharacters().getData());break;
 
                         case TRANSITION:
-                            attributes = element.getAttributes();
-                            String type = null;
-                            char symbol = ' ', nextSymbol = ' ', direction = ' ';
-                            int state = -1, nextState = -1;
-                            while(attributes.hasNext()){
-                                attribute = attributes.next();
-                                switch (attribute.getName().toString()) {
-                                    case TYPE -> type = attribute.getValue();
-                                    case STATE -> state = Integer.parseInt(attribute.getValue());
-                                    case SYMBOL -> symbol = attribute.getValue().charAt(0);
-                                    case NEWSTATE -> nextState = Integer.parseInt(attribute.getValue());
-                                    case NEWSYMBOL -> nextSymbol = attribute.getValue().charAt(0);
-                                    case DIRECTION -> direction = attribute.getValue().charAt(0);
-                                    default -> {
-                                        System.err.printf("Undefined xml tag: %s\n", attribute.getName().toString());
-                                        System.exit(-1);
-                                    }
-                                }
+                            String ttype = element.getAttributeByName(new QName(TYPE)).getValue();
 
-                                if(type.equals(STATE_TRANSITION)){
-                                    int shift = (direction == 'L') ? -1 : 1;
-                                    transitions.add(new TuringTransition(state, symbol, nextState, nextSymbol, TransitionType.STATE_TRANSITION, shift));
-                                }else if(type.equals(HALT)){
-                                    transitions.add(new TuringTransition(state, symbol, -1, nextSymbol, TransitionType.HALT, 0));
-                                }else{
-                                    System.err.printf("Undefined xml attribute value: %s\n", type);
-                                    System.exit(-1);
-                                }
-                            }break;
-                        case INPUT: input = element.asCharacters().getData();
+                            char symbol = element.getAttributeByName(new QName(SYMBOL)).getValue().charAt(0);
+                            int state = Integer.parseInt(element.getAttributeByName(new QName(STATE)).getValue());
+
+                            if(ttype.equals(STATE_TRANSITION)){
+                                char nextSymbol = element.getAttributeByName(new QName(NEWSYMBOL)).getValue().charAt(0);
+                                char direction = element.getAttributeByName(new QName(DIRECTION)).getValue().charAt(0);
+                                int nextState = Integer.parseInt(element.getAttributeByName(new QName(NEWSTATE)).getValue());
+                                int shift = (direction == 'L') ? -1 : 1;
+                                transitions.add(new TuringTransition(state, symbol, nextState, nextSymbol, TransitionType.STATE_TRANSITION, shift));
+                            }else if(ttype.equals(HALT)){
+                                transitions.add(new TuringTransition(state, symbol, -1, ' ', TransitionType.HALT, 0));
+                            }else{
+                                System.err.printf("Undefined xml attribute value: %s\n", ttype);
+                                System.exit(-1);
+                            }
+                            break;
+                        case INPUT:
+                            event = reader.nextEvent();
+                            input = event.asCharacters().getData();
                     }
                 }else if(event.isEndElement()){
                     EndElement element = event.asEndElement();

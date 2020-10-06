@@ -37,7 +37,7 @@ public class TagSystem extends Machine{
          * @throws IllegalArgumentException if given type is invalid.
          */
         public TagSystemTransition(TransitionType type, char symbol, String append){
-            if(!type.equals(TransitionType.APPEND) || !type.equals(TransitionType.HALT))
+            if(!type.equals(TransitionType.APPEND) && !type.equals(TransitionType.HALT))
                 throw new IllegalArgumentException("Invalid transition type for tag system.");
             this.symbol = symbol;
             this.append = append;
@@ -164,7 +164,7 @@ public class TagSystem extends Machine{
 
     protected void execute(TagSystemTransition t){
         switch (t.getType()) {
-            case APPEND -> {
+            case APPEND:
                 getInput_tape().append(t.getAppend());
                 int delete = getDeletionNumber();
                 while (delete > 0) {
@@ -172,12 +172,13 @@ public class TagSystem extends Machine{
                     getInput_tape().shift(1);
                     delete--;
                 }
-            }
-            case HALT -> halt();
-            default -> {
+                break;
+            case HALT:
+                halt();
+                break;
+            default:
                 System.err.println("Fatal error when generating this tagsystem");
                 System.exit(-1);
-            }
         }
     }
 
@@ -230,34 +231,38 @@ public class TagSystem extends Machine{
                             attributes = element.getAttributes();
                             if(attributes.hasNext()){
                                 attribute = attributes.next();
-                                if(attribute.getName().toString().equals(TYPE) && !attribute.getValue().equals("non-universal")) {
+                                if(attribute.getName().toString().equals(TYPE) && reader.nextEvent().asCharacters().getData().equals("non-universal")) {
                                     System.err.println("Invalid tag for Tagsystem simulation");
                                     System.exit(-1);
                                 }
                             }break;
 
                         case CLASS: //check whether the xml is valid TagSystem configuration.
-                            if(!element.asCharacters().getData().equals("TagSystem")){
+                            event = reader.nextEvent();
+                            if(!event.asCharacters().getData().equals("TagSystem")){
                                 System.err.println("Invalid class value for tagsystem simulation");
                                 System.exit(-1);
                             }break;
 
                         case DELETIONNUMBER:
-                            deletionNumber = Integer.parseInt(element.asCharacters().getData());
+                            event = reader.nextEvent();
+                            deletionNumber = Integer.parseInt(event.asCharacters().getData());break;
 
                         case SYMBOL: //add symbol to temporary list
                             attributes = element.getAttributes();
+                            event = reader.nextEvent();
                             if(attributes.hasNext()){
                                 attribute = attributes.next();
                                 if(attribute.getName().toString().equals(TYPE) && attribute.getValue().equals("blank")){
-                                    blank = element.getName().getLocalPart().charAt(0);
+                                    blank = event.asCharacters().getData().charAt(0);
                                 }
                             }
-                            symbols_temp.add(element.asCharacters().getData().charAt(0));break;
+                            symbols_temp.add(event.asCharacters().getData().charAt(0));break;
 
                         case TRANSITION:
                             attributes = element.getAttributes();
                             String type = null;
+                            event = reader.nextEvent();
                             char symbol = (char)-1;
                             while(attributes.hasNext()){
                                 attribute = attributes.next();
@@ -271,7 +276,10 @@ public class TagSystem extends Machine{
                                 }
                             }
                             if(type.equals(APPEND)){
-                                transitions.add(new TagSystemTransition(TransitionType.APPEND, symbol, element.asCharacters().getData()));
+                                if(event.isEndElement())
+                                    transitions.add(new TagSystemTransition(TransitionType.APPEND, symbol, ""));
+                                else
+                                    transitions.add(new TagSystemTransition(TransitionType.APPEND, symbol, event.asCharacters().getData()));
                             }else if(type.equals(HALT)){
                                 transitions.add(new TagSystemTransition(TransitionType.HALT, symbol, ""));
                             }else{
@@ -280,7 +288,8 @@ public class TagSystem extends Machine{
                             }break;
 
                         case INPUT:
-                            input = element.asCharacters().getData();
+                            event = reader.nextEvent();
+                            input = event.asCharacters().getData();break;
                     }
                 }else if(event.isEndElement()){
                     EndElement element = event.asEndElement();

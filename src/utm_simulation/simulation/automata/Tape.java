@@ -47,13 +47,13 @@ public class Tape implements Iterable<Character> {
 
         public void setPrevious(Cell previous){
             if(previous != null)
-                previous.setNext(this);
+                previous.next = this;
             this.previous = previous;
         }
 
         public void setNext(Cell next){
             if(next != null)
-                next.setPrevious(this);
+                next.previous = this;
             this.next = next;
         }
 
@@ -181,7 +181,7 @@ public class Tape implements Iterable<Character> {
     private void shiftToLeft(){
         Cell temp = getCurrent().getPrevious();
         if(temp == null){
-            temp = new Cell(BLANK, null, temp);
+            temp = new Cell(BLANK, null, getFront());
             setFront(temp);
         }
         setCurrent(temp);
@@ -190,7 +190,7 @@ public class Tape implements Iterable<Character> {
     private void shiftToRight(){
         Cell temp = getCurrent().getNext();
         if(temp == null){
-            temp = new Cell(BLANK, temp, null);
+            temp = new Cell(BLANK, getEnd(), null);
             setEnd(temp);
         }
         setCurrent(temp);
@@ -224,6 +224,54 @@ public class Tape implements Iterable<Character> {
         return new Iterator<Character>() {
             private Cell current = ptr;
 
+            @Override
+            public boolean hasNext() {
+                return current != null;
+            }
+
+            @Override
+            public Character next() {
+                char next = current.getAlphabet();
+                current = current.getNext();
+                return next;
+            }
+        };
+    }
+
+    public Iterator<Character> reverseIterator(int start){
+        Cell ptr = getFront();
+        int i = 0 ;
+        while(i < start){
+            ptr = ptr.getNext();
+            i++;
+        }
+        Cell finalPtr = ptr;
+        return new Iterator<Character>() {
+            private Cell current = finalPtr;
+            @Override
+            public boolean hasNext() {
+                return current != null;
+            }
+
+            @Override
+            public Character next() {
+                char next = current.getAlphabet();
+                current = current.getPrevious();
+                return next;
+            }
+        };
+    }
+
+    public Iterator<Character> iterator(int start){
+        Cell ptr = getFront();
+        int i = 0 ;
+        while(i < start){
+            ptr = ptr.getNext();
+            i++;
+        }
+        Cell finalPtr = ptr;
+        return new Iterator<Character>() {
+            private Cell current = finalPtr;
             @Override
             public boolean hasNext() {
                 return current != null;
