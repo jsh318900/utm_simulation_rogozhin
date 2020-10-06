@@ -1,0 +1,43 @@
+<Simulation>
+    <Machine Type="universal">
+        <Class>TuringMachine</Class>
+
+        <Symbols>
+            <Symbol>0</Symbol>
+            <Symbol>1</Symbol>
+            <Symbol Type="blank">b</Symbol>
+            <Symbol>c</Symbol>
+            <Symbol>d</Symbol>
+        </Symbols>
+        <NumStates>5</NumStates>
+        <Transitions>
+            <Transition Type="state_transition" State="1" Symbol="0" NewState="1" NewSymbol="1" Direction="R"/>
+            <Transition Type="state_transition" State="1" Symbol="1" NewState="1" NewSymbol="0" Direction="L"/>
+            <Transition Type="state_transition" State="1" Symbol="b" NewState="1" NewSymbol="d" Direction="R"/>
+            <Transition Type="state_transition" State="1" Symbol="c" NewState="2" NewSymbol="0" Direction="R"/>
+            <Transition Type="state_transition" State="1" Symbol="d" NewState="1" NewSymbol="b" Direction="L"/>
+            <Transition Type="state_transition" State="2" Symbol="0" NewState="2" NewSymbol="0" Direction="R"/>
+            <Transition Type="state_transition" State="2" Symbol="1" NewState="2" NewSymbol="0" Direction="R"/>
+            <Transition Type="state_transition" State="2" Symbol="b" NewState="4" NewSymbol="0" Direction="L"/>
+            <Transition Type="state_transition" State="2" Symbol="c" NewState="2" NewSymbol="c" Direction="R"/>
+            <Transition Type="state_transition" State="2" Symbol="d" NewState="2" NewSymbol="d" Direction="R"/>
+            <Transition Type="state_transition" State="3" Symbol="0" NewState="4" NewSymbol="c" Direction="L"/>
+            <Transition Type="state_transition" State="3" Symbol="1" NewState="3" NewSymbol="0" Direction="R"/>
+            <Transition Type="state_transition" State="3" Symbol="b" NewState="5" NewSymbol="b" Direction="R"/>
+            <Transition Type="state_transition" State="3" Symbol="c" NewState="3" NewSymbol="c" Direction="R"/>
+            <Transition Type="state_transition" State="3" Symbol="d" NewState="3" NewSymbol="d" Direction="R"/>
+            <Transition Type="state_transition" State="4" Symbol="0" NewState="4" NewSymbol="1" Direction="L"/>
+            <Transition Type="state_transition" State="4" Symbol="1" NewState="2" NewSymbol="0" Direction="R"/>
+            <Transition Type="state_transition" State="4" Symbol="b" NewState="3" NewSymbol="d" Direction="L"/>
+            <Transition Type="state_transition" State="4" Symbol="c" NewState="4" NewSymbol="c" Direction="L"/>
+            <Transition Type="state_transition" State="4" Symbol="d" NewState="4" NewSymbol="d" Direction="L"/>
+            <Transition Type="halt" State="5" Symbol="0"/>
+            <Transition Type="state_transition" State="5" Symbol="1" NewState="5" NewSymbol="1" Direction="R"/>
+            <Transition Type="halt" State="5" Symbol="b"/>
+            <Transition Type="state_transition" State="5" Symbol="c" NewState="1" NewSymbol="1" Direction="R"/>
+            <Transition Type="state_transition" State="5" Symbol="d" NewState="5" NewSymbol="b" Direction="R"/>
+        </Transitions>
+
+    </Machine>
+
+</Simulation>

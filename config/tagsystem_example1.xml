@@ -1,0 +1,21 @@
+<Simulation>
+    <Machine Type="non-universal">
+        <Class>TagSystem</Class>
+        <DeletionNumber>2</DeletionNumber>
+        <Symbols>
+            <Symbol>1</Symbol>
+            <Symbol>2</Symbol>
+            <Symbol>3</Symbol>
+            <Symbol>a</Symbol>
+            <Symbol Type="blank">b</Symbol>
+        </Symbols>
+        <Transitions>
+            <Transition Type="append" Symbol="1">b12a</Transition>
+            <Transition Type="append" Symbol="2">b23a</Transition>
+            <Transition Type="halt" Symbol="3"/>
+            <Transition Type="append" Symbol="a"></Transition>
+            <Transition Type="append" Symbol="b"></Transition>
+        </Transitions>
+        <Input>11</Input>
+    </Machine>
+</Simulation>
